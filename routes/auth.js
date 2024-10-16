@@ -1,3 +1,4 @@
+// routes/auth.js
 const express = require('express');
 const { registerConsumer, registerRestaurant, login } = require('../controllers/authControllers');
 const router = express.Router();

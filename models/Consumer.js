@@ -1,3 +1,4 @@
+// models/Consumer.js
 const mongoose = require('mongoose');
 
 const consumerSchema = new mongoose.Schema({

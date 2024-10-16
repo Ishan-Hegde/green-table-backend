@@ -1,6 +1,6 @@
 const Consumer = require('../models/Consumer');
 const Restaurant = require('../models/Restaurant');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Register consumer
@@ -35,13 +35,19 @@ const registerRestaurant = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        
+        // Check in both collections
         const user = await Consumer.findOne({ email }) || await Restaurant.findOne({ email });
+        
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);
+        
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
+        // Create JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        
         res.json({ token });
     } catch (err) {
         console.error(err);
