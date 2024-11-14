@@ -9,7 +9,6 @@ const restaurantRoutes = require('./routes/restaurant');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-const foodController = require('./controllers/foodControllers'); // Import food controller
 
 dotenv.config();
 const app = express();
@@ -27,19 +26,13 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/food', foodRoutes);
 app.use('/api/address', addressRoutes);
 app.use('/api/restaurant', restaurantRoutes);
-
-// Food Routes with Socket.io passed to controller
-app.post('/api/food', (req, res) => {
-    foodController.addFoodListing(req, res, io); // Pass io to the controller
-});
-app.get('/api/food/:restaurantId', foodController.getFoodListings);
 
 // Real-time socket event
 io.on('connection', (socket) => {
     console.log('A user connected');
-
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
