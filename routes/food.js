@@ -4,5 +4,8 @@ const router = express.Router();
 
 // Add food listing
 router.post('/', addFoodListing);
+// Get food listings by restaurantId
+router.get('/:restaurantId', getFoodListings);
+
 
 module.exports = router;
