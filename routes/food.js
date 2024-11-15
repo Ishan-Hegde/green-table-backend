@@ -1,13 +1,14 @@
 // routes/food.js
 const express = require('express');
 const { addFoodListing, getFoodListings } = require('../controllers/foodControllers');
+const FoodListing = require('../models/Food');
 const router = express.Router();
 
 // Fetch all food listings
-router.get('/', async (req, res) => {
+router.get('/all', async (req, res) => {
     try {
       // Fetch all food items from the database
-      const foodItems = await Food.find();
+      const foodItems = await FoodListing.find();
   
       // Send the food items back as JSON
       res.status(200).json(foodItems);
