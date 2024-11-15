@@ -11,7 +11,7 @@ const foodSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     category: { type: String, required: true },  // Add category field
     timeOfCooking: {
-        type: Date,
+        type: String,
         required: true
     },
 });
