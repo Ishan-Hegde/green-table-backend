@@ -1,9 +1,9 @@
+// routes/restaurant.js
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const router = express.Router();
 const Restaurant = require('../models/Restaurant');
 
-// Register Restaurant Endpoint
+// Register Restaurant Endpoint (existing code)
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -48,6 +48,17 @@ router.post('/register', async (req, res) => {
       message: 'Failed to register restaurant',
       error: error.message || 'Internal server error',
     });
+  }
+});
+
+// Fetch all restaurant details
+router.get('/all', async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find({}, { password: 0 }); // Exclude password field
+    res.status(200).json(restaurants);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch restaurant details' });
   }
 });
 

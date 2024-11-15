@@ -12,6 +12,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const consumerRoutes = require('./routes/consumer');
+
+
 
 dotenv.config();
 const app = express();
@@ -46,6 +49,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/food', foodRoutes); // foodRoutes will receive req.io
 app.use('/api/address', addressRoutes);
 app.use('/api/restaurant', restaurantRoutes);
+app.use('/api/consumer', consumerRoutes); // Add this line for consumer routes
+
 
 // Real-time socket event
 io.on('connection', (socket) => {
