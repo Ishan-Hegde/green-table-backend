@@ -13,7 +13,8 @@ const addFoodListing = async (req, res) => {
             description,
             price,
             quantity,
-            expiryDate,      
+            expiryDate,      // Ensure expiryDate is handled properly
+            timeOfCooking,   // New field for cooking time
         });
 
         // Save the new food item to the database
