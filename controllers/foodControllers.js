@@ -36,7 +36,7 @@ const getFoodListings = async (req, res) => {
 
   try {
     // Fetch food items that belong to the specific restaurant using the restaurantId
-    const foodItems = await Food.find({ restaurantId });
+    const foodItems = await FoodListing.find({ restaurantId });
 
     if (!foodItems.length) {
       return res.status(404).json({ message: 'No food items found for this restaurant' });
