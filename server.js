@@ -7,14 +7,12 @@ const authRoutes = require('./routes/auth');
 const foodRoutes = require('./routes/food');
 const addressRoutes = require('./routes/address');
 const restaurantRoutes = require('./routes/restaurant');
+const consumerRoutes = require('./routes/consumer');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const consumerRoutes = require('./routes/consumer');
-
-
 
 dotenv.config();
 const app = express();
@@ -40,38 +38,37 @@ app.use(limiter);
 
 // Pass io to routes that need it
 app.use((req, res, next) => {
-    req.io = io;
-    next();
+  req.io = io;
+  next();
 });
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/food', foodRoutes); // foodRoutes will receive req.io
+app.use('/api/food', foodRoutes);
 app.use('/api/address', addressRoutes);
-app.use('/api/restaurant', restaurantRoutes);
-app.use('/api/consumer', consumerRoutes); // Add this line for consumer routes
-
+app.use('/api/restaurant', restaurantRoutes); // Restaurant route
+app.use('/api/consumer', consumerRoutes); // Consumer route
 
 // Real-time socket event
 io.on('connection', (socket) => {
-    console.log('A user connected');
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
+  console.log('A user connected');
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start the server
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 // Root route
 app.get('/', (req, res) => {
-    res.send('Welcome to the Green Table API!');
+  res.send('Welcome to the Green Table API!');
 });

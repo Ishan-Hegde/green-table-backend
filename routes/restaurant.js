@@ -62,4 +62,23 @@ router.get('/all', async (req, res) => {
   }
 });
 
+// Add the route to fetch a restaurant by its unique _id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the restaurant by its unique _id
+    const restaurant = await Restaurant.findById(id);
+
+    if (!restaurant) {
+      return res.status(404).send('Restaurant not found');
+    }
+
+    // Send the restaurant data back as JSON
+    res.json(restaurant);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;
