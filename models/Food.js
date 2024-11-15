@@ -9,7 +9,6 @@ const foodSchema = new mongoose.Schema({
     expiryDate: Date,
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    timeOfCooking: { type: Number, required: true },  // New field for cooking time in minutes
 });
 
 const FoodListing = mongoose.model('FoodListing', foodSchema);

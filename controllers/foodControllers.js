@@ -4,7 +4,7 @@ const FoodListing = require('../models/Food'); // Correct model import
 // Add food listing
 const addFoodListing = async (req, res) => {
     try {
-        const { restaurantId, restaurantName, foodItems, description, price, quantity, expiryDate, timeOfCooking } = req.body;
+        const { restaurantId, restaurantName, foodItems, description, price, quantity } = req.body;
 
         const newFoodListing = new FoodListing({
             restaurantId,
@@ -13,8 +13,6 @@ const addFoodListing = async (req, res) => {
             description,
             price,
             quantity,
-            expiryDate,      // Ensure expiryDate is handled properly
-            timeOfCooking,   // New field for cooking time
         });
 
         // Save the new food item to the database
