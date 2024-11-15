@@ -4,12 +4,11 @@ const mongoose = require('mongoose');
 const foodSchema = new mongoose.Schema({
     restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     restaurantName: { type: String, required: true },
-    foodItems: [String],  // Array of food item names or IDs
+    foodItems: [String], 
     description: String,
     expiryDate: Date,
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    timeOfCooking: { type: Number, required: true },  // New field for cooking time in minutes
 });
 
 const FoodListing = mongoose.model('FoodListing', foodSchema);
