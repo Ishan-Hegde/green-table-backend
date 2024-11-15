@@ -23,7 +23,7 @@ const validateFoodListing = [
 ];
 
 // Fetch all food listings
-router.get('/all', async (res) => {
+router.get('/all', async (req, res) => {
   try {
     const foodItems = await FoodListing.find();
 
