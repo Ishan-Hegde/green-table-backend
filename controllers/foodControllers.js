@@ -4,7 +4,7 @@ const FoodListing = require('../models/Food'); // Correct model import
 // Add food listing
 const addFoodListing = async (req, res) => {
     try {
-        const { restaurantId, restaurantName, foodItems, description, price, quantity, expiryDate, timeOfCooking } = req.body;
+        const { restaurantId, restaurantName, foodItems, description, price, quantity, category, expiryDate } = req.body;
 
         const newFoodListing = new FoodListing({
             restaurantId,
@@ -13,15 +13,14 @@ const addFoodListing = async (req, res) => {
             description,
             price,
             quantity,
-            expiryDate,   // Added expiryDate field
-            timeOfCooking // Added timeOfCooking field
+            category,
+            expiryDate,
         });
 
-        // Save the new food item to the database
         await newFoodListing.save();
-
-        // Emit the new food listing to all connected clients
-        req.io.emit('newFoodAvailable', newFoodListing); // Broadcasting to all clients
+        
+        // Emit to all connected consumers when new food is added
+        req.io.emit('newFoodAvailable', newFoodListing);
 
         res.status(201).json(newFoodListing);
     } catch (err) {
@@ -29,6 +28,7 @@ const addFoodListing = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
 
 // Get all food listings by restaurant ID
 const getFoodListings = async (req, res) => {
