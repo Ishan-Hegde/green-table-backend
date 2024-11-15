@@ -1,4 +1,5 @@
 // server.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -46,8 +47,8 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/food', foodRoutes);
 app.use('/api/address', addressRoutes);
-app.use('/api/restaurant', restaurantRoutes); // Restaurant route
-app.use('/api/consumer', consumerRoutes); // Consumer route
+app.use('/api/restaurant', restaurantRoutes);
+app.use('/api/consumer', consumerRoutes);
 
 // Real-time socket event
 io.on('connection', (socket) => {
@@ -61,6 +62,17 @@ io.on('connection', (socket) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
+});
+
+// Test MongoDB Connection
+app.get('/test-db', async (req, res) => {
+  try {
+    const test = await mongoose.connection.db.admin().ping();
+    res.status(200).json({ message: 'MongoDB is connected', data: test });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'MongoDB connection failed' });
+  }
 });
 
 // Start the server
