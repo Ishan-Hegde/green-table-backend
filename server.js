@@ -9,22 +9,16 @@ const foodRoutes = require('./routes/food');
 const addressRoutes = require('./routes/address');
 const restaurantRoutes = require('./routes/restaurant');
 const consumerRoutes = require('./routes/consumer');
-const orderRoutes = require('./routes/orderRoutes');
 const cors = require('cors');
 const http = require('http');
-const { Server } = require('socket.io');
+const socketIo = require('socket.io');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+const io = socketIo(server);
 
 const PORT = process.env.PORT || 5000;
 
@@ -55,16 +49,10 @@ app.use('/api/food', foodRoutes);
 app.use('/api/address', addressRoutes);
 app.use('/api/restaurant', restaurantRoutes);
 app.use('/api/consumer', consumerRoutes);
-app.use('/api/orders', orderRoutes);
 
-// Real-time WebSocket order tracking
+// Real-time socket event
 io.on('connection', (socket) => {
   console.log('A user connected');
-
-  socket.on('joinOrderRoom', (orderId) => {
-    socket.join(orderId);
-  });
-
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
@@ -96,6 +84,3 @@ server.listen(PORT, () => {
 app.get('/', (req, res) => {
   res.send('Welcome to the Green Table API!');
 });
-
-// Export io instance for usage in other routes
-module.exports = io;
