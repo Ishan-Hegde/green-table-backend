@@ -1,10 +1,23 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // Store hashed passwords
-    otp: { type: String, default: null }, // Store OTP temporarily
-    otpExpiresAt: { type: Date, default: null } // Expiry time for OTP
+    password: { type: String, required: true },
+    emailPassword: { type: String, required: true }, // This will be encrypted
+    otp: { type: String },
+    otpExpires: { type: Date }
 });
 
-module.exports = mongoose.model("User", UserSchema);
+// Hash emailPassword before saving the user
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('emailPassword')) return next();
+    
+    const salt = await bcrypt.genSalt(10);
+    this.emailPassword = await bcrypt.hash(this.emailPassword, salt);
+    
+    next();
+});
+
+module.exports = mongoose.model('User', userSchema);

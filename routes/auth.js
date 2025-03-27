@@ -1,63 +1,66 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const User = require("../models/User");
-const sendOTP = require("../utils/emailService");
-
+const express = require('express');
 const router = express.Router();
+const User = require('../models/User');
+const crypto = require('crypto');
+const sendEmail = require('../utils/emailService');
 
-// 🔹 Register User (with email & password)
-router.post("/register", async (req, res) => {
-    const { email, password } = req.body;
+// User Registration Route
+router.post('/register', async (req, res) => {
+    const { name, email, password, emailPassword } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash password
-        const user = new User({ email, password: hashedPassword });
+        let user = await User.findOne({ email });
+
+        if (user) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        // Create new user
+        user = new User({ name, email, password, emailPassword });
+
+        // Generate OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        user.otp = otp;
+        user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+
         await user.save();
-        res.json({ message: "User registered successfully" });
-    } catch (err) {
-        res.status(500).json({ error: "Error registering user" });
+
+        // Send OTP via email using user's credentials
+        await sendEmail(email, emailPassword, "Your OTP Code", `Your OTP is: ${otp}`);
+
+        res.status(201).json({ message: "User registered. OTP sent to email." });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error registering user", error });
     }
 });
 
-// 🔹 Send OTP & Store in User DB
-router.post("/send-otp", async (req, res) => {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-        return res.status(404).json({ error: "User not found" });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 min expiry
-
-    user.otp = otp;
-    user.otpExpiresAt = otpExpiresAt;
-    await user.save();
-
-    await sendOTP(email, otp);
-    res.json({ message: "OTP sent successfully" });
-});
-
-// 🔹 Verify OTP & Login
-router.post("/verify-otp", async (req, res) => {
+// OTP Verification Route
+router.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
-    const user = await User.findOne({ email });
 
-    if (!user || user.otp !== otp) {
-        return res.status(400).json({ error: "Invalid OTP" });
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        // Check OTP and expiration
+        if (user.otp !== otp || user.otpExpires < Date.now()) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        // OTP verified, clear it from DB
+        user.otp = null;
+        user.otpExpires = null;
+        await user.save();
+
+        res.status(200).json({ message: "OTP verified successfully" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error verifying OTP", error });
     }
-
-    if (new Date() > user.otpExpiresAt) {
-        return res.status(400).json({ error: "OTP expired" });
-    }
-
-    // OTP Verified ✅ - Remove OTP from the DB
-    user.otp = null;
-    user.otpExpiresAt = null;
-    await user.save();
-
-    res.json({ message: "OTP verified successfully" });
 });
 
 module.exports = router;
