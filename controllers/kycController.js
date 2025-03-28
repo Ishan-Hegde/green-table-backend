@@ -1,42 +1,26 @@
-const KYC = require('../models/KYC');
-const User = require('../models/User');
-
-// Submit KYC
-exports.submitKYC = async (req, res) => {
+exports.uploadKycDocuments = async (req, res) => {
     try {
-        const { userId, restaurantName, ownerName, address, licenseNumber, documents } = req.body;
-
-        const existingKYC = await KYC.findOne({ userId });
-
-        if (existingKYC) {
-            return res.status(400).json({ message: 'KYC already submitted' });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files uploaded' });
         }
 
-        const kyc = await KYC.create({ userId, restaurantName, ownerName, address, licenseNumber, documents });
+        // Simulate saving file information to MongoDB
+        res.status(200).json({ message: 'KYC documents uploaded successfully' });
 
-        res.status(201).json({ message: 'KYC submitted successfully', kyc });
     } catch (error) {
-        res.status(500).json({ message: 'KYC submission failed', error });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-// Approve or Reject KYC
-exports.approveKYC = async (req, res) => {
+exports.getKycDocuments = async (req, res) => {
     try {
-        const { kycId, status } = req.body;
-
-        const kyc = await KYC.findById(kycId);
-        if (!kyc) return res.status(404).json({ message: 'KYC not found' });
-
-        kyc.status = status;
-        await kyc.save();
-
-        if (status === 'approved') {
-            await User.findByIdAndUpdate(kyc.userId, { kycCompleted: true });
+        const user = await KycModel.findOne({ email: req.params.email });
+        if (!user) {
+            return res.status(404).json({ message: "No KYC documents found" });
         }
-
-        res.json({ message: `KYC ${status}`, kyc });
+        res.status(200).json({ documents: user.documents });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating KYC status', error });
+        res.status(500).json({ message: "Server error" });
     }
 };

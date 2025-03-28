@@ -1,14 +1,12 @@
 const express = require('express');
 const authRoutes = require('./authRoutes');
-const kycRoutes = require('./kycRoutes');
-const foodRoutes = require('./foodRoutes');
-const locationRoutes = require('./locationRoutes');
 
-const router = express.Router();
+const app = express();
+app.use(express.json());
 
-router.use('/auth', authRoutes);
-router.use('/kyc', kycRoutes);
-router.use('/food', foodRoutes);
-router.use('/location', locationRoutes);
+app.use('/auth', authRoutes);
 
-module.exports = router;
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
